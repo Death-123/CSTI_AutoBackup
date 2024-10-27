@@ -36,8 +36,8 @@ public class GameSaveInfo
 
     public string getCharacterName()
     {
-        if(CharacterName.Contains("("))
-            return CharacterName.Substring(CharacterName.IndexOf('(') + 1, CharacterName.LastIndexOf(')') - CharacterName.LastIndexOf('(') - 1);
+        if(Character.Contains("("))
+            return Character.Substring(Character.IndexOf('(') + 1, Character.LastIndexOf(')') - Character.LastIndexOf('(') - 1);
         return Character == "Custom" ? CharacterName : Character;
     }
 

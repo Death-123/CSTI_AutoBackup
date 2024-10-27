@@ -47,7 +47,9 @@ public class AutoBackup : BaseUnityPlugin
 
     public static void SaveGame()
     {
+        if(!MBSingleton<GameManager>.Instance) return;
         GameLoad.Instance.AutoSaveGame(false);
+        NotifyGameSaved();
     }
 
     public static void LoadGame(GameSaveInfo info)
@@ -145,7 +147,7 @@ public class AutoBackup : BaseUnityPlugin
     private void OnGUI()
     {
         if (!ShowGUI) return;
-        GUILayout.BeginArea(new Rect(Screen.width * 0.3f, Screen.height * 0.2f, Screen.width * 0.25f, Screen.height * 0.68f), "", "box");
+        GUILayout.BeginArea(new Rect(Screen.width * 0.2f, Screen.height * 0.2f, Screen.width * 0.25f, Screen.height * 0.68f), "", "box");
         MenuGui();
         FilesGUI();
         GUILayout.EndArea();
@@ -159,7 +161,7 @@ public class AutoBackup : BaseUnityPlugin
             SaveGame();
         if (GUILayout.Button("Load Last Game", height))
             GameLoad.Instance.AutoLoadGame();
-        if (GUILayout.Button("Refresh FIles", height))
+        if (GUILayout.Button("Refresh Saves", height))
             LoadSaveFiles();
         if (GUILayout.Button("Close", height))
             ShowGUI = false;
@@ -168,11 +170,8 @@ public class AutoBackup : BaseUnityPlugin
 
     private void FilesGUI()
     {
-        new GUIStyle().alignment = TextAnchor.MiddleCenter;
-
         GUILayout.BeginVertical("box");
-
-
+        
         var height = GUILayout.Height((float)(Screen.height * 0.5 * 0.05));
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Back", height)) Slot = -1;
@@ -186,18 +185,7 @@ public class AutoBackup : BaseUnityPlugin
         {
             foreach (var slot in GameSaves.Keys.OrderBy(num => num))
             {
-                GUILayout.BeginVertical();
-                GUILayout.Label($"slot {slot + 1}");
-                var startPosition = GUILayoutUtility.GetLastRect().position;
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("");
-                GUILayout.FlexibleSpace();
-                GUILayout.Label("");
-                GUILayout.EndHorizontal();
-                GUILayout.EndVertical();
-                GUILayout.Label("");
-                var endPosition = GUILayoutUtility.GetLastRect().position + GUILayoutUtility.GetLastRect().size;
-                if (GUI.Button(new Rect(startPosition, endPosition - startPosition), ""))
+                if (GUILayout.Button($"slot {slot + 1}", height))
                     Slot = slot;
             }
         }
@@ -205,7 +193,7 @@ public class AutoBackup : BaseUnityPlugin
         {
             foreach (var saveInfo in GameSaves[Slot].ToList())
             {
-                GUILayout.BeginHorizontal();
+                GUILayout.BeginHorizontal("box");
                 // 左边信息显示
                 GUILayout.BeginVertical();
                 //现实时间
@@ -220,6 +208,7 @@ public class AutoBackup : BaseUnityPlugin
                 //地点
                 GUILayout.Label(saveInfo.getEnvName());
                 GUILayout.EndVertical();
+                GUILayout.FlexibleSpace();
                 //右边按钮
                 GUILayout.BeginVertical();
                 if (GUILayout.Button("Load")) LoadGame(saveInfo);
@@ -262,5 +251,11 @@ public class AutoBackup : BaseUnityPlugin
                 Logger.LogError($"Unknown Timer Type: {AutoBackupConfig.TimerType.Value}");
                 throw new ArgumentOutOfRangeException();
         }
+    }
+    
+    public static void NotifyGameSaved()
+    {
+        var instance = MBSingleton<GraphicsManager>.Instance;
+        instance.PlayMessage(instance.TimeSpentWheel.transform.position, "Game Saved", instance.TimeSpentWheel.transform);
     }
 }
