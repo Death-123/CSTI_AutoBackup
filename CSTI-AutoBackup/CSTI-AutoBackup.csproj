@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <AssemblyName>CSTI_AutoBackup</AssemblyName>
+        <Product>auto backup</Product>
+        <Version>1.0.0.1</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>latest</LangVersion>
+        <RestoreAdditionalProjectSources>
+            https://api.nuget.org/v3/index.json;
+            https://nuget.bepinex.dev/v3/index.json;
+            https://nuget.samboy.dev/v3/index.json
+        </RestoreAdditionalProjectSources>
+        <RootNamespace>CSTI_AutoBackup</RootNamespace>
+        <OutputPath1>D:\Steam\steamapps\common\Card Survival Tropical Island\BepInEx\plugins\test</OutputPath1>
+    </PropertyGroup>
+
+    <Target Name="CopyOutputFiles" AfterTargets="Build">
+        <ItemGroup>
+            <OutputFiles Include="$(OutputPath)$(TargetFileName)"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(OutputPath1)"/>
+    </Target>
+<!--    <Target Name="ClearOutputFiles" BeforeTargets="Build">-->
+<!--        <ItemGroup>-->
+<!--            <ClOutputFiles Include="D:\SteamLibrary\steamapps\common\Card Survival Tropical Island\BepInEx\plugins\ModLoader\CSTI_LuaActionSupport.dll"/>-->
+<!--        </ItemGroup>-->
+<!--        <Delete Files="@(ClOutputFiles)"/>-->
+<!--    </Target>-->
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.Core" Version="5.*"/>
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*"/>
+        <PackageReference Include="UnityEngine.Modules" Version="2019.4.38.16628595" IncludeAssets="compile"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>..\..\..\..\Steam\steamapps\common\Card Survival Tropical Island\Card Survival - Tropical Island_Data\Managed\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+</Project>
