@@ -19,6 +19,7 @@ public class AutoBackup : BaseUnityPlugin
     private static readonly Dictionary<int, List<GameSaveInfo>> GameSaves = new();
     private static int Slot = -1;
     private bool ShowGUI;
+    private bool QuickSaveLoad = false;
     private Vector2 FilesListScrollView;
 
     [System.Diagnostics.Conditional("DEBUG")]
@@ -40,14 +41,19 @@ public class AutoBackup : BaseUnityPlugin
 
     private void Update()
     {
-        if (!AutoBackupConfig.OpenMenuKey.Value.IsDown()) return;
-        // LogInfo("key pressed");
-        ShowGUI = !ShowGUI;
+        if (AutoBackupConfig.OpenMenuKey.Value.IsDown())
+            // LogInfo("key pressed");
+            ShowGUI = !ShowGUI;
+        if(!QuickSaveLoad) return;
+        if (AutoBackupConfig.AutoSaveKey.Value.IsDown())
+            SaveGame();
+        if (AutoBackupConfig.AutoLoadKey.Value.IsDown())
+            GameLoad.Instance.AutoLoadGame();
     }
 
     public static void SaveGame()
     {
-        if(!MBSingleton<GameManager>.Instance) return;
+        if (!MBSingleton<GameManager>.Instance) return;
         GameLoad.Instance.AutoSaveGame(false);
         NotifyGameSaved();
     }
@@ -171,12 +177,13 @@ public class AutoBackup : BaseUnityPlugin
     private void FilesGUI()
     {
         GUILayout.BeginVertical("box");
-        
+
         var height = GUILayout.Height((float)(Screen.height * 0.5 * 0.05));
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Back", height)) Slot = -1;
         GUILayout.Label(Slot == -1 ? "" : $"Slot: {Slot + 1}", height);
         GUILayout.FlexibleSpace();
+        QuickSaveLoad = GUILayout.Toggle(QuickSaveLoad, "Enable Quick Save/Load", height);
         GUILayout.EndHorizontal();
 
 
@@ -252,7 +259,7 @@ public class AutoBackup : BaseUnityPlugin
                 throw new ArgumentOutOfRangeException();
         }
     }
-    
+
     public static void NotifyGameSaved()
     {
         var instance = MBSingleton<GraphicsManager>.Instance;
